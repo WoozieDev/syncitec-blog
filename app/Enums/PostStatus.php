@@ -1,0 +1,15 @@
+<?php
+
+namespace App\Enums;
+
+enum PostStatus: string
+{
+    case Draft = 'draft';
+    case Published = 'published';
+    case Scheduled = 'scheduled';
+
+    public function isPublic(): bool
+    {
+        return $this === self::Published;
+    }
+}
