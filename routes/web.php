@@ -33,7 +33,7 @@ Route::middleware(['auth', 'verified'])
         Route::patch('users/{user}/restore', [UserController::class, 'restore'])->name('users.restore');
         Route::resource('users', UserController::class);
 
-        Route::resource('roles', RoleController::class)->only(['index']);
+        Route::resource('roles', RoleController::class)->only(['index', 'edit', 'update']);
         Route::resource('permissions', PermissionController::class)->only(['index']);
 
         Route::resource('posts', PostController::class)->only(['index']);
