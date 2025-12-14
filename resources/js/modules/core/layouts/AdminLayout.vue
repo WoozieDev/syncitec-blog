@@ -1,38 +1,37 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import { Link, usePage } from '@inertiajs/vue3';
-import Sidebar from '@modules/core/components/Sidebar.vue';
-import FlashMessage from '@modules/core/components/FlashMessage.vue';
-import type { AdminPageProps, AuthUser } from '@modules/core/types';
-
+import { ref, computed } from 'vue'
+import { Link, usePage } from '@inertiajs/vue3'
+import Sidebar from '@modules/core/components/Sidebar.vue'
+import FlashMessage from '@modules/core/components/FlashMessage.vue'
+import type { AdminPageProps, AuthUser } from '@modules/core/types'
 
 const page = usePage<AdminPageProps>()
 
-const mobileSidebarOpen = ref(false);
+const mobileSidebarOpen = ref(false)
 
 const title = computed(() => page.props.title ?? 'Dashboard')
-
 const user = computed<AuthUser | undefined>(() => page.props.auth?.user)
 
 const toggleMobileSidebar = () => {
     mobileSidebarOpen.value = !mobileSidebarOpen.value
 }
-
 </script>
 
 <template>
     <div class="flex min-h-screen bg-background text-foreground">
         <!-- Sidebar desktop -->
-        <Sidebar />
+        <Sidebar variant="desktop" />
 
         <!-- Sidebar mobile overlay -->
         <transition name="fade">
-            <div v-if="mobileSidebarOpen" class="fixed inset-0 z-40 flex md:hidden">
-                <div class="relative flex w-64 flex-col bg-sidebar border-r text-sidebar-foreground">
-                    <Sidebar />
-                </div>
+            <div v-if="mobileSidebarOpen" class="fixed inset-0 z-40 md:hidden">
+                <!-- Backdrop -->
+                <div class="absolute inset-0 bg-black/50" @click="mobileSidebarOpen = false" />
 
-                <div class="flex-1 bg-black/50" @click="mobileSidebarOpen = false" />
+                <!-- Drawer -->
+                <div class="relative h-full w-64 bg-sidebar text-sidebar-foreground shadow-lg">
+                    <Sidebar variant="mobile" @navigate="mobileSidebarOpen = false" />
+                </div>
             </div>
         </transition>
 
@@ -70,6 +69,7 @@ const toggleMobileSidebar = () => {
                             class="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
                             {{ user?.name?.[0] ?? 'U' }}
                         </div>
+
                         <div class="hidden flex-col text-right text-xs md:flex">
                             <span class="font-medium">
                                 {{ user?.name ?? 'User' }}
@@ -81,7 +81,7 @@ const toggleMobileSidebar = () => {
                     </div>
 
                     <Link href="/logout" method="post" as="button"
-                        class="hidden rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground shadow-sm hover:bg-primary/90 md:inline-flex">
+                        class="rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground shadow-sm hover:bg-primary/90">
                         Logout
                     </Link>
                 </div>
@@ -90,11 +90,8 @@ const toggleMobileSidebar = () => {
             <!-- Contenido -->
             <main class="flex-1 bg-gradient-to-b from-background to-background/95">
                 <div class="mx-auto w-full max-w-6xl px-4 py-6 md:px-6 md:py-8">
-
                     <FlashMessage class="mb-6" />
-
                     <slot />
-                    
                 </div>
             </main>
         </div>

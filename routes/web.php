@@ -37,7 +37,10 @@ Route::middleware(['auth', 'verified'])
         Route::resource('permissions', PermissionController::class)->only(['index']);
 
         Route::resource('posts', PostController::class)->only(['index']);
-        Route::resource('categories', CategoryController::class)->only(['index']);
+
+        Route::patch('categories/{category}/restore', [CategoryController::class, 'restore'])->name('categories.restore');
+        Route::resource('categories', CategoryController::class);
+        
         Route::resource('tags', TagController::class)->only(['index']);
         Route::resource('comments', CommentController::class)->only(['index']);
     });
