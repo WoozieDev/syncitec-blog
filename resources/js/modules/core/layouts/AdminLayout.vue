@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue';
 import { Link, usePage } from '@inertiajs/vue3';
 import Sidebar from '@modules/core/components/Sidebar.vue';
+import FlashMessage from '@modules/core/components/FlashMessage.vue';
 import type { AdminPageProps, AuthUser } from '@modules/core/types';
 
 
@@ -89,7 +90,11 @@ const toggleMobileSidebar = () => {
             <!-- Contenido -->
             <main class="flex-1 bg-gradient-to-b from-background to-background/95">
                 <div class="mx-auto w-full max-w-6xl px-4 py-6 md:px-6 md:py-8">
+
+                    <FlashMessage class="mb-6" />
+
                     <slot />
+                    
                 </div>
             </main>
         </div>

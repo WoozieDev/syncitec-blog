@@ -10,7 +10,7 @@ const props = defineProps<{
     users: Paginated<UserListItem>
 }>()
 
-const { destroyUser, processing } = useUsers()
+const { destroyUser, restoreUser, processing } = useUsers()
 const page = usePage()
 
 const canManageUsers = computed<boolean>(
@@ -41,9 +41,15 @@ const canManageUsers = computed<boolean>(
                 <tr v-for="user in users.data" :key="user.id">
                     <td class="px-4 py-2">
                         <div class="flex items-center gap-2">
-                            <span v-if="user.deleted_at" class="inline-flex h-2 w-2 rounded-full bg-destructive"
-                                title="Deleted" />
-                            <span>{{ user.name }}</span>
+                            <span class="font-medium">{{ user.name }}</span>
+
+                            <span 
+                                v-if="user.deleted_at" 
+                                class="inline-flex items-center rounded-full border px-2 py-0.5 text-xs text-muted-foreground" 
+                                title="Deleted" 
+                            > 
+                                Deleted 
+                            </span>
                         </div>
                     </td>
                     <td class="px-4 py-2 text-muted-foreground">
@@ -57,10 +63,25 @@ const canManageUsers = computed<boolean>(
                     </td>
                     <td class="px-4 py-2 text-right">
                         <div class="inline-flex items-center gap-2">
-                            <Link v-if="canManageUsers" :href="`/admin/users/${user.id}/edit`"
-                                class="text-xs text-primary hover:underline">
+
+                            <Link 
+                                v-if="canManageUsers && !user.deleted_at" 
+                                :href="`/admin/users/${user.id}/edit`" 
+                                class="text-xs text-primary hover:underline"
+                            >
                                 Edit
                             </Link>
+
+                            <button
+                                v-if="canManageUsers && user.deleted_at"
+                                type="button"
+                                class="text-xs text-primary hover:underline disabled:opacity-50"
+                                :disabled="processing"
+                                @click="restoreUser(user.id)"
+                            >
+                                Restore
+                            </button>
+
                             <button v-if="canManageUsers && !user.deleted_at" type="button"
                                 class="text-xs text-destructive hover:underline disabled:opacity-50"
                                 :disabled="processing" @click="destroyUser(user.id)">

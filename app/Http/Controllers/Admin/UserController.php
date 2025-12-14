@@ -129,4 +129,17 @@ class UserController extends Controller
             ->route('admin.users.index')
             ->with('success', 'User deleted successfully.');
     }
+
+    public function restore(int $user): RedirectResponse
+    {
+        $model = User::withTrashed()->findOrFail($user);
+
+        Gate::authorize('restore', $model);
+
+        $model->restore();
+
+        return redirect()
+            ->route('admin.users.index')
+            ->with('success', 'User restored successfully.');
+    }
 }

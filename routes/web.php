@@ -30,6 +30,7 @@ Route::middleware(['auth', 'verified'])
     ->group( function () {
         Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
+        Route::patch('users/{user}/restore', [UserController::class, 'restore'])->name('users.restore');
         Route::resource('users', UserController::class);
 
         Route::resource('roles', RoleController::class)->only(['index']);

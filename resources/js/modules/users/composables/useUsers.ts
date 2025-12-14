@@ -20,7 +20,7 @@ export default function useUsers() {
             replace: true,
             onFinish: () => (processing.value = false),
         });
-    };
+    }
 
     const destroyUser = (userId: number) => {
         if (!confirm('Are you sure you want to delete this user?')) return;
@@ -32,11 +32,22 @@ export default function useUsers() {
             preserveScroll: true,
             onFinish: () => (processing.value = false),
         });
-    };
+    }
+
+    const restoreUser = (userId: number) => {
+        processing.value = true
+
+        router.patch(`/admin/users/${userId}/restore`, {}, {
+            preserveState: true,
+            preserveScroll: true,
+            onFinish: () => (processing.value = false),
+        })
+    }
 
     return {
         processing,
         index,
         destroyUser,
-    };
+        restoreUser,
+    }
 }
