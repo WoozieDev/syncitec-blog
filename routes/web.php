@@ -30,7 +30,8 @@ Route::middleware(['auth', 'verified'])
     ->group( function () {
         Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
-        Route::resource('users', UserController::class)->only(['index']);
+        Route::resource('users', UserController::class);
+
         Route::resource('roles', RoleController::class)->only(['index']);
         Route::resource('permissions', PermissionController::class)->only(['index']);
 

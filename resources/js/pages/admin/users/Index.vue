@@ -1,14 +1,23 @@
 <script setup lang="ts">
 import AdminLayout from '@modules/core/layouts/AdminLayout.vue'
+import UsersFilters from '@modules/users/components/UsersFilters.vue'
+import UsersTable from '@modules/users/components/UsersTable.vue'
+import type { Paginated } from '@modules/core/types'
+import type { UserListItem } from '@modules/users/types/user'
 
 defineOptions({
     layout: AdminLayout,
 })
 
-// más adelante tipamos bien esto con un tipo Paginated<User>
-defineProps<{
+const props = defineProps<{
     title?: string
-    users: any
+    users: Paginated<UserListItem>
+    filters: {
+        search?: string | null
+        role?: string | null
+        trashed?: string | null
+    }
+    roleOptions: string[]
 }>()
 </script>
 
@@ -25,9 +34,8 @@ defineProps<{
             </div>
         </header>
 
-        <!-- Placeholder: luego aquí irá el componente UsersTable del módulo users -->
-        <div class="rounded-xl border bg-card p-4 text-sm text-muted-foreground">
-            Users module coming soon…
-        </div>
+        <UsersFilters :filters="props.filters" :role-options="props.roleOptions" />
+
+        <UsersTable :users="props.users" />
     </div>
 </template>

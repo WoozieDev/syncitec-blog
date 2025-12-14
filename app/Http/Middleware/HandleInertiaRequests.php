@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -38,12 +39,28 @@ class HandleInertiaRequests extends Middleware
     {
         [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
 
+        $user = Auth::user();
+        $roles = [];
+        $permissions = [];
+        $can = [];
+
+        if ( $user ) {
+            $roles = $user->roles->pluck('name')->values();
+            $permissions = $user->permissions()->pluck('name')->values();
+
+            // mapa simple permissionName => bool
+            $can = $permissions->mapWithKeys(fn ($name) => [$name => true])->all();
+        }
+
         return [
             ...parent::share($request),
             'name' => config('app.name'),
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
-                'user' => $request->user(),
+                'user' => $user,
+                'roles' => $roles,
+                'permissions' => $permissions,
+                'can' => $can,
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];

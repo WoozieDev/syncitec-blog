@@ -3,6 +3,8 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -81,5 +83,52 @@ class User extends Authenticatable
     public function hasAnyRole(array $roleNames): bool
     {
         return $this->roles->whereIn('name', $roleNames)->isNotEmpty();
+    }
+
+    public function permissions()
+    {
+        // permisos agregados a través de los roles
+        return $this->roles->loadMissing('permissions')
+            ->pluck('permissions')
+            ->flatten()
+            ->unique('id')
+            ->values();
+    }
+
+    public function hasPermission(string $permissionName): bool
+    {
+        return $this->permissions()->contains('name', $permissionName);
+    }
+
+    public function hasAnyPermission(array $permissionNames): bool
+    {
+        return $this->permissions()->whereIn('name', $permissionNames)->isNotEmpty();
+    }
+
+    // Scopes
+
+    public function scopeSearch(Builder $query, ?string $term): Builder
+    {
+        if (! $term) {
+            return $query;
+        }
+
+        $term = trim($term);
+
+        return $query->where(function (Builder $q) use ($term) {
+            $q->where('name', 'like', "%{$term}%")
+            ->orWhere('email', 'like', "%{$term}%");
+        });
+    }
+
+    public function scopeWithRole(Builder $query, ?string $roleName): Builder
+    {
+        if (! $roleName) {
+            return $query;
+        }
+
+        return $query->whereHas('roles', function (Builder $q) use ($roleName) {
+            $q->where('name', $roleName);
+        });
     }
 }
