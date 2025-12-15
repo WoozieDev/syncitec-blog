@@ -36,7 +36,8 @@ Route::middleware(['auth', 'verified'])
         Route::resource('roles', RoleController::class)->only(['index', 'edit', 'update']);
         Route::resource('permissions', PermissionController::class)->only(['index']);
 
-        Route::resource('posts', PostController::class)->only(['index']);
+        Route::patch('posts/{post}/restore', [PostController::class, 'restore'])->name('posts.restore');
+        Route::resource('posts', PostController::class);
 
         Route::patch('categories/{category}/restore', [CategoryController::class, 'restore'])->name('categories.restore');
         Route::resource('categories', CategoryController::class);

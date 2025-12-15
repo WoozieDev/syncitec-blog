@@ -9,14 +9,15 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 
 class Post extends Model
 {
-    use HasFactory;
-    use SoftDeletes;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'user_id',
+        'category_id',
+        'author_id',
         'title',
         'slug',
         'excerpt',
@@ -35,16 +36,58 @@ class Post extends Model
         'status' => PostStatus::class,
     ];
 
+    protected static function booted(): void
+    {
+        static::saving(function (Post $post) {
+            $nameChanged = $post->isDirty('title');
+            $slugChanged = $post->isDirty('slug');
+
+            if (blank($post->slug)) {
+                $base = Str::slug($post->title);
+                $post->slug = static::uniqueSlug($base, $post->id);
+                return;
+            }
+
+            if ($nameChanged && ! $slugChanged) {
+                $base = Str::slug($post->title);
+                $post->slug = static::uniqueSlug($base, $post->id);
+            }
+
+            if ($slugChanged) {
+                $base = Str::slug($post->slug);
+                $post->slug = static::uniqueSlug($base, $post->id);
+            }
+        });
+    }
+
+    private static function uniqueSlug(string $base, ?int $ignoreId = null): string
+    {
+        $slug = $base;
+        $i = 2;
+
+        while (
+            static::query()
+                ->when($ignoreId, fn ($q) => $q->where('id', '!=', $ignoreId))
+                ->where('slug', $slug)
+                ->exists()
+        ) {
+            $slug = "{$base}-{$i}";
+            $i++;
+        }
+
+        return $slug;
+    }
+
     // Relationships
+
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(Category::class);
+    }
 
     public function author(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'user_id');
-    }
-
-    public function categories(): BelongsToMany
-    {
-        return $this->belongsToMany(Category::class);
+        return $this->belongsTo(User::class, 'author_id');
     }
 
     public function tags(): BelongsToMany
