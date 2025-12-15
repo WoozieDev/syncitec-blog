@@ -41,6 +41,8 @@ Route::middleware(['auth', 'verified'])
         Route::patch('categories/{category}/restore', [CategoryController::class, 'restore'])->name('categories.restore');
         Route::resource('categories', CategoryController::class);
         
-        Route::resource('tags', TagController::class)->only(['index']);
+        Route::patch('tags/{tag}/restore', [TagController::class, 'restore'])->name('tags.restore');
+        Route::resource('tags', TagController::class);
+
         Route::resource('comments', CommentController::class)->only(['index']);
     });
