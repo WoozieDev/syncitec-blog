@@ -13,6 +13,7 @@ import {
 	Users,
 	Shield,
 	KeyRound,
+	MessageCircleDashedIcon
 } from 'lucide-vue-next'
 
 const props = withDefaults(defineProps<{ variant?: 'desktop' | 'mobile' }>(), {
@@ -84,6 +85,13 @@ const allNavItems = computed<NavItem[]>(() => [
 		pattern: /^\/admin\/permissions/,
 		icon: KeyRound,
 		permission: 'manage_permissions',
+	},
+	{
+		label: 'Comments',
+		href: '/admin/comments',
+		pattern: /^\/admin\/comments/,
+		icon: MessageCircleDashedIcon,
+		permission: '',
 	},
 ])
 

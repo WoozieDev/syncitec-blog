@@ -10,9 +10,9 @@ use Illuminate\Http\Request;
 
 class CommentController extends Controller
 {
-    public function store(Request $request, string $slug): RedirectResponse
+    public function store(Request $request): RedirectResponse
     {
-        $post = Post::query()->visibleBySlug($slug)->firstOrFail();
+        $post = Post::query()->visibleBySlug( $request->slug )->firstOrFail();
 
         $data = $request->validate([
             'body' => ['required', 'string', 'min:3', 'max:2000'],

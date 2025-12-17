@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import BlogLayout from '@modules/core/layouts/AppLayout.vue';
-import { Link } from '@inertiajs/vue3';
+import { Link, useForm } from '@inertiajs/vue3';
 import { ref } from 'vue';
 
 defineOptions({ layout: BlogLayout })
@@ -31,7 +31,14 @@ const props = defineProps<{
     }[]
 }>()
 
-const body = ref('');
+const form = useForm({
+    slug: props.post.slug,
+    body: ''
+})
+
+const submitComment = () => {
+    form.post(`/posts/comments`)
+}
 
 </script>
 
@@ -97,10 +104,10 @@ const body = ref('');
 
             <!-- Form (solo auth) -->
             <div v-if="($page.props as any).auth?.user" class="rounded-xl border bg-card p-5">
-                <form @submit.prevent="$inertia.post(`/posts/${props.post.slug}/comments`, { body: body })"
+                <form @submit.prevent="submitComment"
                     class="space-y-3">
                     <label class="text-sm font-medium">Leave a comment</label>
-                    <textarea v-model="body" rows="4"
+                    <textarea v-model="form.body" rows="4"
                         class="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
                         placeholder="Write your comment..." />
                     <div class="flex items-center justify-between">
