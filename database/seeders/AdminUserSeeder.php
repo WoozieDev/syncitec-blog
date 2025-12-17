@@ -23,7 +23,6 @@ class AdminUserSeeder extends Seeder
             ]
         );
 
-        $adminRole = Role::where('name', 'admin')->first();
-        $admin->roles()->sync([$adminRole->id]);
+        $admin->roles()->sync(1);
     }
 }

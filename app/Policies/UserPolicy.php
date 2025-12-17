@@ -8,7 +8,7 @@ class UserPolicy
 {
     public function viewAny(User $user): bool
     {
-        return $user->hasPermission('view_users') || $user->hasPermission('manage_users');
+        return $user->hasPermission('users.view');
     }
 
     public function view(User $user, User $model): bool
@@ -18,12 +18,12 @@ class UserPolicy
 
     public function create(User $user): bool
     {
-        return $user->hasPermission('manage_users');
+        return $user->hasPermission('users.create');
     }
 
     public function update(User $user, User $model): bool
     {
-        return $user->hasPermission('manage_users');
+        return $user->hasPermission('users.update');
     }
 
     public function delete(User $user, User $model): bool
@@ -33,16 +33,11 @@ class UserPolicy
             return false;
         }
 
-        return $user->hasPermission('manage_users');
+        return $user->hasPermission('users.delete');
     }
 
     public function restore(User $user, User $model): bool
     {
-        return $user->hasPermission('manage_users');
-    }
-
-    public function forceDelete(User $user, User $model): bool
-    {
-        return false; // no usamos forceDelete en MVP
+        return $user->hasPermission('users.restore');
     }
 }

@@ -19,7 +19,7 @@ class DashboardController extends Controller
 {
     public function index(): Response
     {
-        Gate::authorize('viewAdmin'); // si no tienes este gate, cambia a: Gate::authorize('viewAny', User::class);
+        //Gate::authorize('viewAdmin'); // si no tienes este gate, cambia a: Gate::authorize('viewAny', User::class);
 
         $stats = [
             'posts_total' => Post::count(),

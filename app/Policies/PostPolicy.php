@@ -13,7 +13,7 @@ class PostPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasPermission('manage_posts');
+        return $user->hasPermission('posts.view');
     }
 
     /**
@@ -21,7 +21,7 @@ class PostPolicy
      */
     public function view(User $user, Post $post): bool
     {
-        return $user->hasPermission('manage_posts');
+        return $user->hasPermission('posts.view');
     }
 
     /**
@@ -29,7 +29,7 @@ class PostPolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasPermission('manage_posts');
+        return $user->hasPermission('posts.create');
     }
 
     /**
@@ -37,7 +37,7 @@ class PostPolicy
      */
     public function update(User $user, Post $post): bool
     {
-        return $user->hasPermission('manage_posts');
+        return $user->hasPermission('posts.update');
     }
 
     /**
@@ -45,7 +45,7 @@ class PostPolicy
      */
     public function delete(User $user, Post $post): bool
     {
-        return $user->hasPermission('manage_posts');
+        return $user->hasPermission('posts.delete');
     }
 
     /**
@@ -53,14 +53,6 @@ class PostPolicy
      */
     public function restore(User $user, Post $post): bool
     {
-        return $user->hasPermission('manage_posts');
-    }
-
-    /**
-     * Determine whether the user can permanently delete the model.
-     */
-    public function forceDelete(User $user, Post $post): bool
-    {
-        return $user->hasPermission('manage_posts');
+        return $user->hasPermission('posts.restore');
     }
 }

@@ -13,7 +13,7 @@ class CategoryPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasPermission('manage_categories');
+        return $user->hasPermission('categorie.view');
     }
 
     /**
@@ -21,7 +21,7 @@ class CategoryPolicy
      */
     public function view(User $user, Category $category): bool
     {
-        return $user->hasPermission('manage_categories');
+        return $user->hasPermission('categorie.view');
     }
 
     /**
@@ -29,7 +29,7 @@ class CategoryPolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasPermission('manage_categories');
+        return $user->hasPermission('categorie.create');
     }
 
     /**
@@ -37,7 +37,7 @@ class CategoryPolicy
      */
     public function update(User $user, Category $category): bool
     {
-        return $user->hasPermission('manage_categories');
+        return $user->hasPermission('categorie.update');
     }
 
     /**
@@ -45,7 +45,7 @@ class CategoryPolicy
      */
     public function delete(User $user, Category $category): bool
     {
-        return $user->hasPermission('manage_categories');
+        return $user->hasPermission('categorie.delete');
     }
 
     /**
@@ -53,7 +53,7 @@ class CategoryPolicy
      */
     public function restore(User $user, Category $category): bool
     {
-        return $user->hasPermission('manage_categories');
+        return $user->hasPermission('categorie.restore');
     }
     
 }
