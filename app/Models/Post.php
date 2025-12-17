@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\PostStatus;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -110,5 +111,40 @@ class Post extends Model
     public function scopeScheduled($query)
     {
         return $query->where('status', PostStatus::Scheduled);
+    }
+
+    public function scopeVisible(Builder $query): Builder
+    {
+        return $query
+            ->whereNull('deleted_at')
+            ->where(function (Builder $q) {
+                $q->where('status', PostStatus::Published->value)
+                ->orWhere(function (Builder $qq) {
+                    $qq->where('status', PostStatus::Scheduled->value)
+                        ->whereNotNull('published_at')
+                        ->where('published_at', '<=', now());
+                });
+            });
+    }
+
+    public function scopePublicLatest(Builder $query): Builder
+    {
+        return $query->visible()
+            ->orderByDesc('published_at')
+            ->orderByDesc('id');
+    }
+
+    public function scopeVisibleBySlug(Builder $query, string $slug): Builder
+    {
+        return $query->visible()->where('slug', $slug);
+    }
+
+    public function scopePublicWithRelations(Builder $query): Builder
+    {
+        return $query->with([
+            'category:id,name,slug',
+            'author:id,name',
+            'tags:id,name,slug',
+        ]);
     }
 }
