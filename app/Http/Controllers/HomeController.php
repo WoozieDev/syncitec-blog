@@ -28,8 +28,11 @@ class HomeController extends Controller
             ->orderBy('name')
             ->get(['id', 'name', 'slug']);
 
-        // MVP: trending tags simples por nombre (luego: conteo real con withCount)
-        $tags = \App\Models\Tag::query()
+        $trendingTags = Tag::query()
+            ->withCount([
+                'posts as posts_count' => fn ($q) => $q->visible(),
+            ])
+            ->orderByDesc('posts_count')
             ->orderBy('name')
             ->limit(20)
             ->get(['id', 'name', 'slug']);
@@ -47,7 +50,7 @@ class HomeController extends Controller
             ] : null,
             'posts' => $posts,
             'categories' => $categories,
-            'tags' => $tags,
+            'tags' => $trendingTags,
         ]);
     }
 

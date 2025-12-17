@@ -5,7 +5,7 @@ import { Link } from '@inertiajs/vue3';
 defineOptions({ layout: BlogLayout })
 
 type Category = { id: number; name: string; slug: string }
-type Tag = { id: number; name: string; slug: string }
+type Tag = { id: number; name: string; slug: string, posts_count: number }
 
 type PostCard = {
     id: number
@@ -102,9 +102,12 @@ const props = defineProps<{
                         </p>
 
                         <div v-if="props.featured.tags?.length" class="flex flex-wrap gap-2 pt-1">
-                            <Link v-for="t in props.featured.tags" :key="t.id" :href="`/tags/${t.slug}`"
-                                class="inline-flex items-center rounded-full border px-2 py-0.5 text-xs text-muted-foreground hover:bg-muted">
-                                #{{ t.name }}
+                            <Link v-for="t in props.tags" :key="t.id" :href="`/tags/${t.slug}`"
+                                class="inline-flex items-center gap-2 rounded-full border px-2 py-1 text-xs text-muted-foreground hover:bg-muted">
+                                <span>#{{ t.name }}</span>
+                                <span class="rounded-full bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground">
+                                    {{ t.posts_count }}
+                                </span>
                             </Link>
                         </div>
                     </div>
