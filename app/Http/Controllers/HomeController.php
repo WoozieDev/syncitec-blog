@@ -19,9 +19,35 @@ class HomeController extends Controller
             ->paginate(10)
             ->withQueryString();
 
+        $featured = Post::query()
+            ->publicWithRelations()
+            ->publicLatest()
+            ->first();
+
+        $categories = \App\Models\Category::query()
+            ->orderBy('name')
+            ->get(['id', 'name', 'slug']);
+
+        // MVP: trending tags simples por nombre (luego: conteo real con withCount)
+        $tags = \App\Models\Tag::query()
+            ->orderBy('name')
+            ->limit(20)
+            ->get(['id', 'name', 'slug']);
+
         return Inertia::render('Home', [
             'title' => 'Blog',
+            'featured' => $featured ? [
+                'title' => $featured->title,
+                'slug' => $featured->slug,
+                'excerpt' => $featured->excerpt,
+                'published_at' => optional($featured->published_at)->toDateTimeString(),
+                'category' => $featured->category,
+                'author' => $featured->author,
+                'tags' => $featured->tags,
+            ] : null,
             'posts' => $posts,
+            'categories' => $categories,
+            'tags' => $tags,
         ]);
     }
 
