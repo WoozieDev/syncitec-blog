@@ -2,6 +2,7 @@
 
 namespace App\Actions\Fortify;
 
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -30,10 +31,19 @@ class CreateNewUser implements CreatesNewUsers
             'password' => $this->passwordRules(),
         ])->validate();
 
-        return User::create([
+        $user = User::create([
             'name' => $input['name'],
             'email' => $input['email'],
             'password' => $input['password'],
         ]);
+
+        // ✅ Siempre reader (registro público solo para comentar)
+        $readerRoleId = Role::query()->where('name', 'reader')->value('id');
+
+        if ($readerRoleId) {
+            $user->roles()->syncWithoutDetaching([$readerRoleId]);
+        }
+
+        return $user;
     }
 }

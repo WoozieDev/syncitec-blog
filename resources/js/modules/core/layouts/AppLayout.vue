@@ -1,6 +1,9 @@
 <script setup lang="ts">
-import { Link, usePage } from '@inertiajs/vue3'
-import { computed } from 'vue'
+import { Link, usePage } from '@inertiajs/vue3';
+import { computed } from 'vue';
+import { useTheme } from '@modules/core/composables/useTheme';
+
+const { theme, toggleTheme } = useTheme()
 
 const page = usePage()
 const title = computed(() => (page.props as any)?.title ?? 'Syncitec Blog')
@@ -32,6 +35,26 @@ const user = computed(() => auth.value?.user)
                         class="rounded-md px-2 py-1 text-sm text-muted-foreground hover:text-foreground hover:bg-muted">
                         Home
                     </Link>
+
+                    <button type="button" @click="toggleTheme"
+                        class="inline-flex h-9 w-9 items-center justify-center rounded-md border text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">
+                        <span class="sr-only">Toggle theme</span>
+
+                        <!-- Sun -->
+                        <svg v-if="theme === 'dark'" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M12 3v2m0 14v2m9-9h-2M5 12H3m15.364-6.364-1.414 1.414M7.05 16.95l-1.414 1.414m12.728 0-1.414-1.414M7.05 7.05 5.636 5.636M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z" />
+                        </svg>
+
+                        <!-- Moon -->
+                        <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M21 12.79A9 9 0 0 1 11.21 3a7 7 0 1 0 9.79 9.79z" />
+                        </svg>
+                    </button>
+
 
                     <Link v-if="user" href="/admin"
                         class="rounded-md px-2 py-1 text-sm text-muted-foreground hover:text-foreground hover:bg-muted">
