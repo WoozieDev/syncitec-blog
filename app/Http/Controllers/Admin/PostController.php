@@ -12,6 +12,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
+use App\Http\Requests\Admin\StorePostRequest;
+use App\Http\Requests\Admin\UpdatePostRequest;
 
 class PostController extends Controller
 {
@@ -70,34 +72,14 @@ class PostController extends Controller
         ]);
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(StorePostRequest  $request): RedirectResponse
     {
         Gate::authorize('create', Post::class);
 
-        $data = $request->validate([
-            'category_id' => ['required', 'exists:categories,id'],
-            'title' => ['required', 'string', 'max:200'],
-            'slug' => ['nullable', 'string', 'max:220'],
-            'excerpt' => ['nullable', 'string', 'max:2000'],
-            'content' => ['nullable', 'string'],
-            'status' => ['required', 'in:'.implode(',', array_map(fn ($s) => $s->value, PostStatus::cases()))],
-            'published_at' => ['nullable', 'date'],
-            'meta_title' => ['nullable', 'string', 'max:255'],
-            'meta_description' => ['nullable', 'string', 'max:160'],
-            'og_title' => ['nullable', 'string', 'max:255'],
-            'og_description' => ['nullable', 'string', 'max:255'],
-            'og_image' => ['nullable', 'string', 'max:2048'],
-            'tag_ids' => ['array'],
-            'tag_ids.*' => ['integer', 'exists:tags,id'],
-        ]);
+        $data = $request->normalized();
 
         // Enforce author
         $data['author_id'] = $request->user()->id;
-
-        // Normalizar published_at según status (MVP simple)
-        if ($data['status'] === PostStatus::Draft->value) {
-            $data['published_at'] = null;
-        }
 
         $post = Post::create($data);
 
@@ -139,30 +121,11 @@ class PostController extends Controller
         ]);
     }
 
-    public function update(Request $request, Post $post): RedirectResponse
+    public function update(UpdatePostRequest  $request, Post $post): RedirectResponse
     {
         Gate::authorize('update', $post);
 
-        $data = $request->validate([
-            'category_id' => ['required', 'exists:categories,id'],
-            'title' => ['required', 'string', 'max:200'],
-            'slug' => ['nullable', 'string', 'max:220'],
-            'excerpt' => ['nullable', 'string', 'max:2000'],
-            'content' => ['nullable', 'string'],
-            'status' => ['required', 'in:'.implode(',', array_map(fn ($s) => $s->value, PostStatus::cases()))],
-            'published_at' => ['nullable', 'date'],
-            'meta_title' => ['nullable', 'string', 'max:255'],
-            'meta_description' => ['nullable', 'string', 'max:160'],
-            'og_title' => ['nullable', 'string', 'max:255'],
-            'og_description' => ['nullable', 'string', 'max:255'],
-            'og_image' => ['nullable', 'string', 'max:2048'],
-            'tag_ids' => ['array'],
-            'tag_ids.*' => ['integer', 'exists:tags,id'],
-        ]);
-
-        if ($data['status'] === PostStatus::Draft->value) {
-            $data['published_at'] = null;
-        }
+        $data = $request->normalized();
 
         $post->update($data);
         $post->tags()->sync($data['tag_ids'] ?? []);
