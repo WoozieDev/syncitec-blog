@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\PostController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\TagController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\CommentController as ControllersCommentController;
 use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -25,6 +26,10 @@ ROute::get('/', [HomeController::class, 'index'])->name('blog.index');
 ROute::get('posts/{slug}', [HomeController::class, 'show'])->name('blog.show');
 Route::get('categories/{slug}', [HomeController::class, 'category'])->name('blog.category');
 Route::get('tags/{slug}', [HomeController::class, 'tag'])->name('blog.tag');
+
+Route::post('/posts/{slug}/comments', [ControllersCommentController::class, 'store'])
+    ->middleware(['auth'])
+    ->name('blog.comments.store');
 
 Route::get('dashboard', function () {
     return Inertia::render('Dashboard');

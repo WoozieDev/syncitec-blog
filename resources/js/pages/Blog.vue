@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import BlogLayout from '@modules/core/layouts/AppLayout.vue';
-import { Link } from '@inertiajs/vue3'
+import { Link } from '@inertiajs/vue3';
+import { ref } from 'vue';
 
 defineOptions({ layout: BlogLayout })
 
@@ -22,7 +23,16 @@ const props = defineProps<{
         og_description: string | null
         og_image: string | null
     }
+    comments: {
+        id: number
+        body: string
+        created_at: string
+        user: { id: number; name: string }
+    }[]
 }>()
+
+const body = ref('');
+
 </script>
 
 <template>
@@ -77,9 +87,54 @@ const props = defineProps<{
             class="prose prose-neutral max-w-none dark:prose-invert prose-pre:bg-muted prose-pre:border prose-pre:rounded-lg">
             <!-- MVP: texto plano -->
             <pre class="whitespace-pre-wrap font-sans text-sm leading-relaxed">
-{{ props.post.content ?? '' }}
-      </pre>
+                {{ props.post.content ?? '' }}
+            </pre>
         </section>
+
+
+        <section class="border-t pt-8 space-y-6">
+            <h2 class="text-lg font-semibold tracking-tight">Comments</h2>
+
+            <!-- Form (solo auth) -->
+            <div v-if="($page.props as any).auth?.user" class="rounded-xl border bg-card p-5">
+                <form @submit.prevent="$inertia.post(`/posts/${props.post.slug}/comments`, { body: body })"
+                    class="space-y-3">
+                    <label class="text-sm font-medium">Leave a comment</label>
+                    <textarea v-model="body" rows="4"
+                        class="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        placeholder="Write your comment..." />
+                    <div class="flex items-center justify-between">
+                        <p class="text-xs text-muted-foreground">Comments are moderated.</p>
+                        <button
+                            class="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90">
+                            Submit
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div v-else class="rounded-xl border bg-card p-5 text-sm text-muted-foreground">
+                <span>You must </span>
+                <Link href="/login" class="text-primary hover:underline">log in</Link>
+                <span> to comment.</span>
+            </div>
+
+            <!-- List -->
+            <div class="space-y-4">
+                <div v-if="props.comments?.length === 0" class="text-sm text-muted-foreground">
+                    No comments yet.
+                </div>
+
+                <div v-for="c in props.comments" :key="c.id" class="rounded-xl border bg-card p-5">
+                    <div class="flex items-center justify-between text-xs text-muted-foreground">
+                        <span class="font-medium text-foreground">{{ c.user.name }}</span>
+                        <span>{{ c.created_at }}</span>
+                    </div>
+                    <p class="mt-2 text-sm text-muted-foreground whitespace-pre-wrap">{{ c.body }}</p>
+                </div>
+            </div>
+        </section>
+
 
         <!-- Footer navigation -->
         <footer class="border-t pt-6">

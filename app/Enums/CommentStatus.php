@@ -8,7 +8,7 @@ enum CommentStatus: string
     case Approved = 'approved';
     case Rejected = 'rejected';
 
-    public function isVisible(): bool
+    public function isPublic(): bool
     {
         return $this === self::Approved;
     }

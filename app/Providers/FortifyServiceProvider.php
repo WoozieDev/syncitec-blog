@@ -4,16 +4,15 @@ namespace App\Providers;
 
 use App\Actions\Fortify\CreateNewUser;
 use App\Actions\Fortify\ResetUserPassword;
-use App\Http\Responses\LoginResponse;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
+use Laravel\Fortify\Contracts\LoginResponse;
 use Laravel\Fortify\Features;
 use Laravel\Fortify\Fortify;
-use Laravel\Fortify\Contracts\LoginResponse as LoginResponseContract;
 
 class FortifyServiceProvider extends ServiceProvider
 {
@@ -22,7 +21,24 @@ class FortifyServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-       
+        $this->app->instance(LoginResponse::class, new class implements LoginResponse {
+
+            public function toResponse($request)
+            {
+                $user = $request->user();
+
+                // Ajusta estos checks según tu relación roles()
+                $roleNames = $user?->roles()->pluck('name')->all() ?? [];
+
+                $isAdmin = in_array('admin', $roleNames, true);
+                $isEditor = in_array('editor', $roleNames, true);
+
+                $target = ($isAdmin || $isEditor) ? '/admin' : '/';
+
+                return redirect()->intended($target);
+                
+            }
+        });
     }
 
     /**
@@ -34,10 +50,6 @@ class FortifyServiceProvider extends ServiceProvider
         $this->configureViews();
         $this->configureRateLimiting();
 
-         $this->app->singleton(
-            LoginResponseContract::class, 
-            LoginResponse::class
-        );
     }
 
     /**

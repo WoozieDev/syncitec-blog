@@ -59,6 +59,7 @@ class HomeController extends Controller
         $post = Post::query()
             ->publicWithRelations()
             ->visibleBySlug($slug)
+            ->with(['comments' => fn ($q) => $q->approved()->with('user:id,name')->latest()])
             ->firstOrFail();
 
         return Inertia::render('Blog', [
@@ -79,6 +80,15 @@ class HomeController extends Controller
                 'og_description' => $post->og_description,
                 'og_image' => $post->og_image,
             ],
+            'comments' => $post->comments->map(fn ($c) => [
+                'id' => $c->id,
+                'body' => $c->body,
+                'created_at' => $c->created_at->toDateTimeString(),
+                'user' => [
+                    'id' => $c->user->id,
+                    'name' => $c->user->name,
+                ],
+            ]),
         ]);
     }
 

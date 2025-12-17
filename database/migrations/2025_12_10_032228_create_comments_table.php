@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\CommentStatus;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -13,24 +14,30 @@ return new class extends Migration
     {
         Schema::create('comments', function (Blueprint $table) {
             $table->id();
-            
+
             $table->foreignId('post_id')
-                ->constrained()
+                ->constrained('posts')
+                ->cascadeOnUpdate()
                 ->cascadeOnDelete();
 
             $table->foreignId('user_id')
-                ->constrained()
+                ->constrained('users')
+                ->cascadeOnUpdate()
                 ->cascadeOnDelete();
 
-            $table->text('content');
+            $table->text('body');
 
-            $table->enum('status', ['pending', 'approved', 'rejected'])
-                ->default('pending');
+            $table->enum('status', array_map(fn ($c) => $c->value, CommentStatus::cases()))
+                ->default(CommentStatus::Pending->value);
+
+            $table->timestamp('approved_at')->nullable();
+            $table->foreignId('approved_by')->nullable()->constrained('users')->nullOnDelete();
 
             $table->timestamps();
             $table->softDeletes();
 
-            $table->index('status');
+            $table->index(['post_id', 'status', 'created_at']);
+            $table->index(['user_id', 'created_at']);
         });
     }
 
