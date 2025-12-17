@@ -92,6 +92,9 @@ class HandleInertiaRequests extends Middleware
             'can' => collect($permissions)->mapWithKeys(
                 fn (string $name) => [$name => true]
             )->all(),
+            'canAccessAdmin' => $request->user()
+                    ? ($request->user()->hasRole('admin') || $request->user()->hasRole('editor'))
+                    : false,
         ];
     }
 

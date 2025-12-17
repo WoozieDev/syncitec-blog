@@ -56,7 +56,7 @@ const user = computed(() => auth.value?.user)
                     </button>
 
 
-                    <Link v-if="user" href="/admin"
+                    <Link v-if="(page.props as any).auth?.canAccessAdmin" href="/admin"
                         class="rounded-md px-2 py-1 text-sm text-muted-foreground hover:text-foreground hover:bg-muted">
                         Admin
                     </Link>
