@@ -23,6 +23,8 @@ Route::get('/', function () {
 
 ROute::get('/', [HomeController::class, 'index'])->name('blog.index');
 ROute::get('posts/{slug}', [HomeController::class, 'show'])->name('blog.show');
+Route::get('categories/{slug}', [HomeController::class, 'category'])->name('blog.category');
+Route::get('tags/{slug}', [HomeController::class, 'tag'])->name('blog.tag');
 
 Route::get('dashboard', function () {
     return Inertia::render('Dashboard');

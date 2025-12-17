@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\Post;
+use App\Models\Tag;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -48,6 +50,50 @@ class HomeController extends Controller
                 'og_description' => $post->og_description,
                 'og_image' => $post->og_image,
             ],
+        ]);
+    }
+
+    public function category(string $slug): Response
+    {
+        $category = Category::query()->where('slug', $slug)->firstOrFail();
+
+        $posts = Post::query()
+            ->publicWithRelations()
+            ->publicLatest()
+            ->where('category_id', $category->id)
+            ->paginate(10)
+            ->withQueryString();
+
+        return Inertia::render('Category', [
+            'title' => $category->name,
+            'category' => [
+                'id' => $category->id,
+                'name' => $category->name,
+                'slug' => $category->slug,
+            ],
+            'posts' => $posts,
+        ]);
+    }
+
+    public function tag(string $slug): Response
+    {
+        $tag = Tag::query()->where('slug', $slug)->firstOrFail();
+
+        $posts = Post::query()
+            ->publicWithRelations()
+            ->publicLatest()
+            ->whereHas('tags', fn ($q) => $q->where('tags.id', $tag->id))
+            ->paginate(10)
+            ->withQueryString();
+
+        return Inertia::render('Tag', [
+            'title' => $tag->name,
+            'tag' => [
+                'id' => $tag->id,
+                'name' => $tag->name,
+                'slug' => $tag->slug,
+            ],
+            'posts' => $posts,
         ]);
     }
 }
