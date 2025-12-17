@@ -32,46 +32,34 @@ class RoleController extends Controller
     {
         Gate::authorize('update', $role);
 
-        // Cargamos permisos del rol
-        $role->load('permissions:id,name');
-
         $permissions = Permission::query()
             ->orderBy('name')
-            ->get(['name'])
-            ->pluck('name')
-            ->values();
+            ->get(['id', 'name', 'display_name', 'description']);
 
         return Inertia::render('admin/roles/Edit', [
             'title' => 'Edit role',
             'role' => [
                 'id' => $role->id,
                 'name' => $role->name,
-                'permissions' => $role->permissions->pluck('name')->values(),
             ],
             'permissions' => $permissions,
+            'assignedPermissionIds' => $role->permissions()->pluck('permissions.id')->all(),
         ]);
     }
 
-    public function update(Request $request, Role $role): RedirectResponse
+    public function update(Request $request, Role $role)
     {
         Gate::authorize('update', $role);
 
         $data = $request->validate([
-            'permissions' => ['array'],
-            'permissions.*' => ['string', 'exists:permissions,name'],
+            'permission_ids' => ['array'],
+            'permission_ids.*' => ['integer', 'exists:permissions,id'],
         ]);
 
-        $names = $data['permissions'] ?? [];
-
-        $permissionIds = Permission::query()
-            ->whereIn('name', $names)
-            ->pluck('id')
-            ->values();
-
-        $role->permissions()->sync($permissionIds);
+        $role->permissions()->sync($data['permission_ids'] ?? []);
 
         return redirect()
             ->route('admin.roles.index')
-            ->with('success', 'Role permissions updated successfully.');
+            ->with('success', 'Role permissions updated.');
     }
 }
