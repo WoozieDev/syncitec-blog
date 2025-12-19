@@ -22,7 +22,7 @@ const groupedPermissions = computed(() => {
   const map: Record<string, Permission[]> = {}
 
   props.permissions.forEach((permission) => {
-    const [module] = permission.name.split('.')
+    const [module] = permission.name.split('_')
     map[module] ??= []
     map[module].push(permission)
   })

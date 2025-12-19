@@ -13,9 +13,10 @@ const props = defineProps<{
 const { destroyUser, restoreUser, processing } = useUsers()
 const page = usePage()
 
-const canManageUsers = computed<boolean>(
-    () => !!(page.props as any).auth?.can?.manage_users,
-)
+const canUpdateUsers = computed(() => !!(page.props as any)?.auth?.can?.users_update);
+const canDeleteUsers = computed(() => !!(page.props as any)?.auth?.can?.users_delete);
+const canRestoreUsers = computed(() => !!(page.props as any)?.auth?.can?.users_restore);
+
 </script>
 
 <template>
@@ -65,7 +66,7 @@ const canManageUsers = computed<boolean>(
                         <div class="inline-flex items-center gap-2">
 
                             <Link 
-                                v-if="canManageUsers && !user.deleted_at" 
+                                v-if="canUpdateUsers && !user.deleted_at" 
                                 :href="`/admin/users/${user.id}/edit`" 
                                 class="text-xs text-primary hover:underline"
                             >
@@ -73,7 +74,7 @@ const canManageUsers = computed<boolean>(
                             </Link>
 
                             <button
-                                v-if="canManageUsers && user.deleted_at"
+                                v-if="canRestoreUsers && user.deleted_at"
                                 type="button"
                                 class="text-xs text-primary hover:underline disabled:opacity-50"
                                 :disabled="processing"
@@ -82,7 +83,7 @@ const canManageUsers = computed<boolean>(
                                 Restore
                             </button>
 
-                            <button v-if="canManageUsers && !user.deleted_at" type="button"
+                            <button v-if="canDeleteUsers && !user.deleted_at" type="button"
                                 class="text-xs text-destructive hover:underline disabled:opacity-50"
                                 :disabled="processing" @click="destroyUser(user.id)">
                                 Delete

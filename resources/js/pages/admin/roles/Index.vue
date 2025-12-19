@@ -15,7 +15,7 @@ const props = defineProps<{
 }>()
 
 const page = usePage()
-const canManageRoles = computed(() => !!(page.props as any)?.auth?.can?.manage_roles)
+const canManageRoles = computed(() => !!(page.props as any)?.auth?.can?.roles_view)
 </script>
 
 <template>

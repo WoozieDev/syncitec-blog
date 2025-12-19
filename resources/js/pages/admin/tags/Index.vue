@@ -19,7 +19,7 @@ const props = defineProps<{
 }>()
 
 const page = usePage()
-const canManageTags = computed(() => !!(page.props as any)?.auth?.can?.manage_tags)
+const canCreategeTags = computed(() => !!(page.props as any)?.auth?.can?.tags_create);
 
 const { processing, list } = useTags()
 
@@ -37,7 +37,7 @@ const onReset = () => list({ search: null, trashed: null })
         </p>
       </div>
 
-      <Link v-if="canManageTags" href="/admin/tags/create"
+      <Link v-if="canCreategeTags" href="/admin/tags/create"
         class="inline-flex items-center rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90">
         New tag
       </Link>

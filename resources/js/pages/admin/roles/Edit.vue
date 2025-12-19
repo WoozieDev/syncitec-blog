@@ -12,7 +12,7 @@ defineOptions({ layout: AdminLayout })
 
 type Permission = {
     id: number
-    name: string // slug: posts.create
+    name: string // e.g. posts_view
     display_name: string | null
     description: string | null
 }
@@ -24,17 +24,26 @@ const props = defineProps<{
     assignedPermissionIds: number[]
 }>()
 
-const form = useForm({
-    permission_ids: [...props.assignedPermissionIds],
+const form = useForm<{
+    permission_ids: number[]
+}>({
+    permission_ids: props.assignedPermissionIds.map((id) => Number(id)),
 })
 
-const selectedSet = computed(() => new Set<number>(form.permission_ids))
+/**
+ * shadcn Checkbox can emit: boolean | "indeterminate"
+ * Normalize it to boolean.
+ */
+const toBool = (v: boolean | 'indeterminate') => v === true
+
+const selected = computed(() => new Set<number>(form.permission_ids))
 
 const grouped = computed(() => {
     const map: Record<string, Permission[]> = {}
 
     for (const p of props.permissions) {
-        const [module] = p.name.split('.')
+        // ✅ snake_case: module is prefix before first "_"
+        const module = p.name.split('_')[0]
         map[module] ??= []
         map[module].push(p)
     }
@@ -48,54 +57,48 @@ const grouped = computed(() => {
         .sort((a, b) => a.module.localeCompare(b.module))
 })
 
-const isChecked = (id: number) => selectedSet.value.has(id)
+const isChecked = (id: number) => selected.value.has(id)
 
-const toggleOne = (id: number) => {
-    if (isChecked(id)) {
-        form.permission_ids = form.permission_ids.filter((x) => x !== id)
-    } else {
-        form.permission_ids = [...form.permission_ids, id]
+const setOne = (id: number, checked: boolean) => {
+    if (checked) {
+        const nid = Number(id)
+        if (!isChecked(nid)) form.permission_ids = [...form.permission_ids, nid]
+        return
     }
+    form.permission_ids = form.permission_ids.filter((x) => x !== id)
 }
 
-const moduleIds = (module: string) => {
-    return grouped.value.find((g) => g.module === module)?.items.map((i) => i.id) ?? []
-}
+const moduleIds = (module: string) =>
+    grouped.value.find((g) => g.module === module)?.items.map((i) => i.id) ?? []
 
-const isModuleAllChecked = (module: string) => {
+const moduleAllChecked = (module: string) => {
     const ids = moduleIds(module)
     return ids.length > 0 && ids.every((id) => isChecked(id))
 }
 
-const isModuleSomeChecked = (module: string) => {
+const moduleSomeChecked = (module: string) => {
     const ids = moduleIds(module)
-    return ids.some((id) => isChecked(id)) && !isModuleAllChecked(module)
+    return ids.some((id) => isChecked(id)) && !moduleAllChecked(module)
 }
 
-const toggleModule = (module: string) => {
+const setModule = (module: string, checked: boolean) => {
     const ids = moduleIds(module)
-    const all = isModuleAllChecked(module)
 
-    if (all) {
-        // remove all module ids
-        form.permission_ids = form.permission_ids.filter((id) => !ids.includes(id))
-    } else {
-        // add missing module ids
+    if (checked) {
         const next = new Set(form.permission_ids)
         ids.forEach((id) => next.add(id))
         form.permission_ids = Array.from(next)
+        return
     }
+
+    form.permission_ids = form.permission_ids.filter((id) => !ids.includes(id))
 }
 
-const isAllChecked = computed(() => props.permissions.length > 0 && props.permissions.every((p) => isChecked(p.id)))
-const isSomeChecked = computed(() => props.permissions.some((p) => isChecked(p.id)) && !isAllChecked.value)
+const allChecked = computed(() => props.permissions.length > 0 && props.permissions.every((p) => isChecked(p.id)))
+const someChecked = computed(() => props.permissions.some((p) => isChecked(p.id)) && !allChecked.value)
 
-const toggleAll = () => {
-    if (isAllChecked.value) {
-        form.permission_ids = []
-    } else {
-        form.permission_ids = props.permissions.map((p) => p.id)
-    }
+const setAll = (checked: boolean) => {
+    form.permission_ids = checked ? props.permissions.map((p) => Number(p.id)) : []
 }
 
 const submit = () => {
@@ -140,18 +143,17 @@ const submit = () => {
                 <CardTitle class="text-base">All permissions</CardTitle>
 
                 <div class="flex items-center gap-2">
-                    <!-- shadcn checkbox no soporta indeterminate directo en todos los wrappers,
-               así que mostramos estado “some” con texto -->
-                    <Checkbox :checked="isAllChecked" @update:checked="toggleAll" />
+                    <Checkbox :checked="allChecked" @update:checked="(v) => setAll(toBool(v))" />
                     <span class="text-sm">
                         Select all
-                        <span v-if="isSomeChecked" class="text-muted-foreground">(partial)</span>
+                        <span v-if="someChecked" class="text-muted-foreground">(partial)</span>
                     </span>
                 </div>
             </CardHeader>
 
             <CardContent class="text-sm text-muted-foreground">
-                Selected: <span class="font-medium text-foreground">{{ form.permission_ids.length }}</span>
+                Selected:
+                <span class="font-medium text-foreground">{{ form.permission_ids.length }}</span>
             </CardContent>
         </Card>
 
@@ -162,12 +164,11 @@ const submit = () => {
                     <CardTitle class="text-base">{{ group.title }}</CardTitle>
 
                     <div class="flex items-center gap-2">
-                        <Checkbox :checked="isModuleAllChecked(group.module)"
-                            @update:checked="() => toggleModule(group.module)" />
+                        <Checkbox :checked="moduleAllChecked(group.module)"
+                            @update:checked="(v) => setModule(group.module, toBool(v))" />
                         <span class="text-sm">
                             Select all
-                            <span v-if="isModuleSomeChecked(group.module)"
-                                class="text-muted-foreground">(partial)</span>
+                            <span v-if="moduleSomeChecked(group.module)" class="text-muted-foreground">(partial)</span>
                         </span>
                     </div>
                 </CardHeader>
@@ -176,15 +177,17 @@ const submit = () => {
                     <div class="grid gap-3 md:grid-cols-2">
                         <label v-for="p in group.items" :key="p.id"
                             class="flex items-start gap-3 rounded-lg border bg-muted/10 p-3 hover:bg-muted/20">
-                            <Checkbox :checked="isChecked(p.id)" @update:checked="() => toggleOne(p.id)" />
+                            <Checkbox :checked="isChecked(p.id)" @update:checked="(v) => setOne(p.id, toBool(v))" />
 
                             <div class="min-w-0">
                                 <div class="text-sm font-medium">
                                     {{ p.display_name ?? p.name }}
                                 </div>
+
                                 <div v-if="p.description" class="mt-0.5 text-xs text-muted-foreground">
                                     {{ p.description }}
                                 </div>
+
                                 <div class="mt-1 text-xs text-muted-foreground">
                                     {{ p.name }}
                                 </div>

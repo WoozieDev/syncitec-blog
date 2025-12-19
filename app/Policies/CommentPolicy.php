@@ -13,18 +13,18 @@ class CommentPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasPermission('comments.view');
+        return $user->hasPermission('comments_view');
     }
     /**
      * Determine whether the user can update the model.
      */
     public function update(User $user, Comment $comment): bool
     {
-        return $user->hasPermission('comments.moderate');
+        return $user->hasPermission('comments_moderate');
     }
 
     public function delete(User $user, Comment $comment): bool
     {
-        return $user->hasPermission('comments.delete');
+        return $user->hasPermission('comments_delete');
     }
 }

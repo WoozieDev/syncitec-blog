@@ -55,9 +55,9 @@ class RbacSeeder extends Seeder
 
             'roles' => [
                 'view' => ['View roles', 'View roles list.'],
-                //'create' => ['Create roles', 'Create roles.'],
+                // 'create' => ['Create roles', 'Create roles.'],
                 'update' => ['Edit roles', 'Edit roles.'],
-                //'delete' => ['Delete roles', 'Delete roles.'],
+                // 'delete' => ['Delete roles', 'Delete roles.'],
             ],
 
             'permissions' => [
@@ -69,7 +69,8 @@ class RbacSeeder extends Seeder
         // 1) Create/update permissions
         foreach ($permissionsByModule as $module => $actions) {
             foreach ($actions as $action => [$displayName, $description]) {
-                $slug = "{$module}.{$action}";
+                // ✅ snake_case key for frontend-friendly access: posts_create, comments_moderate, etc.
+                $slug = "{$module}_{$action}";
 
                 Permission::updateOrCreate(
                     ['name' => $slug],
@@ -88,17 +89,16 @@ class RbacSeeder extends Seeder
 
         // 3) Assign permissions by role
         $allIds = Permission::query()->pluck('id')->all();
-
         $admin->permissions()->sync($allIds);
 
         $editorSlugs = [
-            'dashboard.view',
+            'dashboard_view',
 
-            'posts.view', 'posts.create', 'posts.update',
-            'categories.view', 'categories.create', 'categories.update',
-            'tags.view', 'tags.create', 'tags.update',
+            'posts_view', 'posts_create', 'posts_update',
+            'categories_view', 'categories_create', 'categories_update',
+            'tags_view', 'tags_create', 'tags_update',
 
-            'comments.view', 'comments.moderate',
+            'comments_view', 'comments_moderate',
         ];
 
         $editor->permissions()->sync(

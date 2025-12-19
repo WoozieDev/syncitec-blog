@@ -43,7 +43,10 @@ class RoleController extends Controller
                 'name' => $role->name,
             ],
             'permissions' => $permissions,
-            'assignedPermissionIds' => $role->permissions()->pluck('permissions.id')->all(),
+            'assignedPermissionIds' => $role->permissions()
+                ->pluck('permissions.id')
+                ->map(fn ($id) => (int) $id)
+                ->all(),
         ]);
     }
 

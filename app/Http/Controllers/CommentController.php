@@ -25,6 +25,8 @@ class CommentController extends Controller
             'status' => CommentStatus::Pending->value,
         ]);
 
-        return back()->with('success', 'Comment submitted and awaiting moderation.');
+        return redirect()
+            ->route('blog.show', $request->slug)
+            ->with('success', 'Comment submitted and awaiting moderation.');
     }
 }

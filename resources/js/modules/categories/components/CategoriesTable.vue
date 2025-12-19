@@ -9,7 +9,10 @@ const props = defineProps<{
 }>()
 
 const page = usePage()
-const canManageCategories = computed(() => !!(page.props as any)?.auth?.can?.manage_categories)
+
+const canUpdateCategories = computed(() => !!(page.props as any)?.auth?.can?.categories_update);
+const canDeleteCategories = computed(() => !!(page.props as any)?.auth?.can?.categories_delete);
+const canRestoreCategories = computed(() => !!(page.props as any)?.auth?.can?.categories_restore);
 
 const { processing, destroyCategory, restoreCategory } = useCategories()
 </script>
@@ -43,18 +46,18 @@ const { processing, destroyCategory, restoreCategory } = useCategories()
 
                     <td class="px-4 py-3 text-right">
                         <div class="inline-flex items-center gap-3">
-                            <Link v-if="canManageCategories && !category.deleted_at"
+                            <Link v-if="canUpdateCategories && !category.deleted_at"
                                 :href="`/admin/categories/${category.id}/edit`" class="text-xs text-primary hover:underline">
                                 Edit
                             </Link>
 
-                            <button v-if="canManageCategories && category.deleted_at" type="button"
+                            <button v-if="canRestoreCategories && category.deleted_at" type="button"
                                 class="text-xs text-primary hover:underline disabled:opacity-50" :disabled="processing"
                                 @click="restoreCategory(category.id)">
                                 Restore
                             </button>
 
-                            <button v-if="canManageCategories && !category.deleted_at" type="button"
+                            <button v-if="canDeleteCategories && !category.deleted_at" type="button"
                                 class="text-xs text-destructive hover:underline disabled:opacity-50"
                                 :disabled="processing" @click="destroyCategory(category.id)">
                                 Delete

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import BlogLayout from '@modules/core/layouts/AppLayout.vue';
 import { Link, useForm } from '@inertiajs/vue3';
+import FlashMessage from '@modules/core/components/FlashMessage.vue';
 import { ref } from 'vue';
 
 defineOptions({ layout: BlogLayout })
@@ -37,7 +38,12 @@ const form = useForm({
 })
 
 const submitComment = () => {
-    form.post(`/posts/comments`)
+    form.post(`/posts/comments`, {
+        preserveState: true,
+        preserveScroll: true,
+        replace: true,
+        onFinish: () => ( form.body = '' ),
+    })
 }
 
 </script>
@@ -101,6 +107,8 @@ const submitComment = () => {
 
         <section class="border-t pt-8 space-y-6">
             <h2 class="text-lg font-semibold tracking-tight">Comments</h2>
+
+            <FlashMessage class="mb-6" />
 
             <!-- Form (solo auth) -->
             <div v-if="($page.props as any).auth?.user" class="rounded-xl border bg-card p-5">

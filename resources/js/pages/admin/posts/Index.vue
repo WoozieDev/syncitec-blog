@@ -21,7 +21,7 @@ const props = defineProps<{
 }>()
 
 const page = usePage()
-const canManagePosts = computed(() => !!(page.props as any)?.auth?.can?.manage_posts)
+const canCreatePosts = computed(() => !!(page.props as any)?.auth?.can?.posts_create);
 
 const { processing, list } = usePosts()
 
@@ -39,7 +39,7 @@ const onReset = () => list({ search: null, status: null, category_id: null, tras
         </p>
       </div>
 
-      <Link v-if="canManagePosts" href="/admin/posts/create"
+      <Link v-if="canCreatePosts" href="/admin/posts/create"
         class="inline-flex items-center rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90">
         New post
       </Link>

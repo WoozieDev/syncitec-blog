@@ -23,7 +23,8 @@ const props = defineProps<{
 }>()
 
 const page = usePage()
-const canManageUsers = computed(() => !!(page.props as any)?.auth?.can?.manage_users)
+
+const canCreategeUsers = computed(() => !!(page.props as any)?.auth?.can?.users_create);
 
 </script>
 
@@ -40,7 +41,7 @@ const canManageUsers = computed(() => !!(page.props as any)?.auth?.can?.manage_u
             </div>
 
             <Link
-                v-if="canManageUsers"
+                v-if="canCreategeUsers"
                 href="/admin/users/create"
                 class="inline-flex items-center rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
             >

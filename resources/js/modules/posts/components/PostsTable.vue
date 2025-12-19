@@ -7,7 +7,9 @@ import usePosts from '@modules/posts/composables/usePosts'
 const props = defineProps<{ posts: PostListItem[] }>()
 
 const page = usePage()
-const canManagePosts = computed(() => !!(page.props as any)?.auth?.can?.manage_posts)
+const canUpdatePosts = computed(() => !!(page.props as any)?.auth?.can?.posts_update);
+const canDeletePosts = computed(() => !!(page.props as any)?.auth?.can?.posts_delete);
+const canRestorePosts = computed(() => !!(page.props as any)?.auth?.can?.posts_restore);
 
 const { processing, destroyPost, restorePost } = usePosts()
 
@@ -64,18 +66,18 @@ const statusBadgeClass = (status: string) => {
 
                     <td class="px-4 py-3 text-right">
                         <div class="inline-flex items-center gap-3">
-                            <Link v-if="canManagePosts && !post.deleted_at" :href="`/admin/posts/${post.id}/edit`"
+                            <Link v-if="canUpdatePosts && !post.deleted_at" :href="`/admin/posts/${post.id}/edit`"
                                 class="text-xs text-primary hover:underline">
                                 Edit
                             </Link>
 
-                            <button v-if="canManagePosts && post.deleted_at" type="button"
+                            <button v-if="canRestorePosts && post.deleted_at" type="button"
                                 class="text-xs text-primary hover:underline disabled:opacity-50" :disabled="processing"
                                 @click="restorePost(post.id)">
                                 Restore
                             </button>
 
-                            <button v-if="canManagePosts && !post.deleted_at" type="button"
+                            <button v-if="canDeletePosts && !post.deleted_at" type="button"
                                 class="text-xs text-destructive hover:underline disabled:opacity-50"
                                 :disabled="processing" @click="destroyPost(post.id)">
                                 Delete

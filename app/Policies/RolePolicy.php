@@ -13,22 +13,22 @@ class RolePolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasPermission('roles.view');
+        return $user->hasPermission('roles_view');
     }
 
     /**
-     * Determine whether the user can view the model.
+     * Determine whether the user can view the model_
      */
     public function view(User $user, Role $role): bool
     {
-        return $user->hasPermission('roles.view');
+        return $user->hasPermission('roles_view');
     }
 
     /**
-     * Determine whether the user can update the model.
+     * Determine whether the user can update the model_
      */
     public function update(User $user, Role $role): bool
     {
-        return $user->hasPermission('roles.edit');
+        return $user->hasPermission('roles_edit');
     }
 }

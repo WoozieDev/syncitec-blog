@@ -9,7 +9,9 @@ const props = defineProps<{
 }>()
 
 const page = usePage()
-const canManageTags = computed(() => !!(page.props as any)?.auth?.can?.manage_tags)
+const canUpdateTags = computed(() => !!(page.props as any)?.auth?.can?.tags_update);
+const canDeleteTags = computed(() => !!(page.props as any)?.auth?.can?.tags_delete);
+const canRestoreTags = computed(() => !!(page.props as any)?.auth?.can?.tags_restore);
 
 const { processing, destroyTag, restoreTag } = useTags()
 </script>
@@ -41,18 +43,18 @@ const { processing, destroyTag, restoreTag } = useTags()
 
                     <td class="px-4 py-3 text-right">
                         <div class="inline-flex items-center gap-3">
-                            <Link v-if="canManageTags && !tag.deleted_at" :href="`/admin/tags/${tag.id}/edit`"
+                            <Link v-if="canUpdateTags && !tag.deleted_at" :href="`/admin/tags/${tag.id}/edit`"
                                 class="text-xs text-primary hover:underline">
                                 Edit
                             </Link>
 
-                            <button v-if="canManageTags && tag.deleted_at" type="button"
+                            <button v-if="canRestoreTags && tag.deleted_at" type="button"
                                 class="text-xs text-primary hover:underline disabled:opacity-50" :disabled="processing"
                                 @click="restoreTag(tag.id)">
                                 Restore
                             </button>
 
-                            <button v-if="canManageTags && !tag.deleted_at" type="button"
+                            <button v-if="canDeleteTags && !tag.deleted_at" type="button"
                                 class="text-xs text-destructive hover:underline disabled:opacity-50"
                                 :disabled="processing" @click="destroyTag(tag.id)">
                                 Delete

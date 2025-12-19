@@ -13,47 +13,47 @@ class TagPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasPermission('tags.view');
+        return $user->hasPermission('tags_view');
     }
 
     /**
-     * Determine whether the user can view the model.
+     * Determine whether the user can view the model_
      */
     public function view(User $user, Tag $tag): bool
     {
-        return $user->hasPermission('tags.view');
+        return $user->hasPermission('tags_view');
     }
 
     /**
-     * Determine whether the user can create models.
+     * Determine whether the user can create models_
      */
     public function create(User $user): bool
     {
-        return $user->hasPermission('tags.create');
+        return $user->hasPermission('tags_create');
     }
 
     /**
-     * Determine whether the user can update the model.
+     * Determine whether the user can update the model_
      */
     public function update(User $user, Tag $tag): bool
     {
-        return $user->hasPermission('tags.update');
+        return $user->hasPermission('tags_update');
     }
 
     /**
-     * Determine whether the user can delete the model.
+     * Determine whether the user can delete the model_
      */
     public function delete(User $user, Tag $tag): bool
     {
-        return $user->hasPermission('tags.delete');
+        return $user->hasPermission('tags_delete');
     }
 
     /**
-     * Determine whether the user can restore the model.
+     * Determine whether the user can restore the model_
      */
     public function restore(User $user, Tag $tag): bool
     {
-        return $user->hasPermission('tags.restore');
+        return $user->hasPermission('tags_restore');
     }
     
 }

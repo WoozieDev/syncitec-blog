@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { Link, usePage } from '@inertiajs/vue3'
-import Sidebar from '@modules/core/components/Sidebar.vue'
-import FlashMessage from '@modules/core/components/FlashMessage.vue'
-import type { AdminPageProps, AuthUser } from '@modules/core/types'
+import { ref, computed } from 'vue';
+import { Link, usePage } from '@inertiajs/vue3';
+import Sidebar from '@modules/core/components/Sidebar.vue';
+import FlashMessage from '@modules/core/components/FlashMessage.vue';
+import type { AdminPageProps, AuthUser } from '@modules/core/types';
 
 const page = usePage<AdminPageProps>()
 

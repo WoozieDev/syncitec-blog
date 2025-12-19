@@ -40,5 +40,9 @@ class AppServiceProvider extends ServiceProvider
 
         });
 
+        Gate::define('view-dashboard', function (User $user) {
+            return $user->hasPermission('dashboard_view');
+        });
+
     }
 }
