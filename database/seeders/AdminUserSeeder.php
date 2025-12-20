@@ -15,14 +15,32 @@ class AdminUserSeeder extends Seeder
      */
     public function run(): void
     {
+        $superadmin = User::firstOrCreate(
+            ['email' => 'superadmin@example.com'],
+            [
+                'name' => 'System Administrator',
+                'password' => Hash::make('password'),
+            ]
+        );
+
         $admin = User::firstOrCreate(
             ['email' => 'admin@example.com'], // puedes cambiarlo
             [
-                'name' => 'System Administrator',
+                'name' => 'Administrator',
                 'password' => Hash::make('password'), // cámbialo luego
             ]
         );
 
-        $admin->roles()->sync(1);
+        $editor = User::firstOrCreate(
+            ['email' => 'editor@example.com'], // puedes cambiarlo
+            [
+                'name' => 'Editor',
+                'password' => Hash::make('password'), // cámbialo luego
+            ]
+        );
+
+        $superadmin->roles()->sync(1);
+        $admin->roles()->sync(2);
+        $editor->roles()->sync(3);
     }
 }

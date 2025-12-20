@@ -83,12 +83,14 @@ class RbacSeeder extends Seeder
         }
 
         // 2) Base roles
+        $superadmin = Role::firstOrCreate(['name' => 'superadmin']);
         $admin = Role::firstOrCreate(['name' => 'admin']);
         $editor = Role::firstOrCreate(['name' => 'editor']);
         $reader = Role::firstOrCreate(['name' => 'reader']);
 
         // 3) Assign permissions by role
         $allIds = Permission::query()->pluck('id')->all();
+        $superadmin->permissions()->sync($allIds);
         $admin->permissions()->sync($allIds);
 
         $editorSlugs = [

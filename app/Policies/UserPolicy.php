@@ -23,11 +23,19 @@ class UserPolicy
 
     public function update(User $user, User $model): bool
     {
+        if ( $model->hasRole('superadmin') && $user->id !== $model->id ) {
+            return false;
+        }
+
         return $user->hasPermission('users_update');
     }
 
     public function delete(User $user, User $model): bool
     {
+        if ( $model->hasRole('superadmin') && $user->id !== $model->id ) {
+            return false;
+        }
+
         // evita que alguien se borre a sí mismo por accidente, opcional
         if ($user->id === $model->id) {
             return false;

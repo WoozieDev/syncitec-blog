@@ -16,7 +16,10 @@ class DatabaseSeeder extends Seeder
         $this->call([
             RbacSeeder::class,
             AdminUserSeeder::class,
-            DemoBlogSeeder::class,
+            //DemoBlogSeeder::class,
+            CategorySeeder::class,
+            TagSeeder::class,
+            PostSeeder::class,
         ]);
     }
 }

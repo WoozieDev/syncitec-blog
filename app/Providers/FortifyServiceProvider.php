@@ -32,8 +32,9 @@ class FortifyServiceProvider extends ServiceProvider
 
                 $isAdmin = in_array('admin', $roleNames, true);
                 $isEditor = in_array('editor', $roleNames, true);
+                $isSuperadmin = in_array('superadmin', $roleNames, true);
 
-                $target = ($isAdmin || $isEditor) ? '/admin' : '/';
+                $target = ( $isSuperadmin || $isAdmin || $isEditor) ? '/admin' : '/';
 
                 return redirect()->intended($target);
                 

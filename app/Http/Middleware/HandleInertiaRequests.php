@@ -93,7 +93,7 @@ class HandleInertiaRequests extends Middleware
                 fn (string $name) => [$name => true]
             )->all(),
             'canAccessAdmin' => $request->user()
-                    ? ($request->user()->hasRole('admin') || $request->user()->hasRole('editor'))
+                    ? ($request->user()->hasRole('superadmin') || $request->user()->hasRole('admin') || $request->user()->hasRole('editor'))
                     : false,
         ];
     }

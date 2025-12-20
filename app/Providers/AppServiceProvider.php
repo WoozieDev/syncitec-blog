@@ -22,18 +22,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-
-        // Admin tiene todos los permisos
-        Gate::before(function ( User $user, string $ability ) {
-
-            if ( $user->hasRole('admin') ) {
-                return true;
-            }
-
-            return null;
+        Gate::before(function (User $user, string $ability) {
+            $user->hasRole('superadmin') ? true : null;
         });
 
-        // Gate genérico que mapea $user->can('manage_users') a permisos de BD
         Gate::define('permission', function ( User $user, string $permissionName ) {
 
             return $user->hasPermission($permissionName);
