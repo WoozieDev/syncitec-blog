@@ -4,7 +4,11 @@ namespace App\Http\Middleware;
 
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Inertia\Middleware;
+
+use function Pest\Laravel\session;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -36,16 +40,73 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
-        [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
+        [$message, $author] = Str::of(Inspiring::quotes()->random())->explode('-');
 
         return [
             ...parent::share($request),
+
             'name' => config('app.name'),
-            'quote' => ['message' => trim($message), 'author' => trim($author)],
-            'auth' => [
-                'user' => $request->user(),
+
+            'quote' => [
+                'message' => trim($message),
+                'author' => trim($author),
             ],
-            'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
+
+            'auth' => $this->sharedAuth($request),
+
+            'flash' => $this->sharedFlash($request),
+
+            'sidebarOpen' => ! $request->hasCookie('sidebar_state')
+                || $request->cookie('sidebar_state') === 'true',
+        ];
+    }
+
+    /**
+     * Shared auth data for Inertia.
+     */
+    private function sharedAuth(Request $request): array
+    {
+        $user = $request->user();
+
+        if (! $user) {
+            return [
+                'user' => null,
+                'roles' => [],
+                'permissions' => [],
+                'can' => [],
+            ];
+        }
+
+        $roles = $user->roles()->pluck('name')->values()->all();
+        $permissions = $user->permissions()->pluck('name')->values()->all();
+
+        return [
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'avatar' => $user->avatar ?? null,
+            ],
+            'roles' => $roles,
+            'permissions' => $permissions,
+            'can' => collect($permissions)->mapWithKeys(
+                fn (string $name) => [$name => true]
+            )->all(),
+            'canAccessAdmin' => $request->user()
+                    ? ($request->user()->hasRole('superadmin') || $request->user()->hasRole('admin') || $request->user()->hasRole('editor'))
+                    : false,
+        ];
+    }
+
+    /**
+     * Shared flash messages.
+     */
+    private function sharedFlash(Request $request): array
+    {
+        return [
+            'success' => $request->session()->get('success'),
+            'error' => $request->session()->get('error'),
+            'warning' => $request->session()->get('warning'),
         ];
     }
 }
